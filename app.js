@@ -383,6 +383,7 @@ let activeCategory = 'all';
 let currentSearch = '';
 let currentSort = 'default';
 let activeView = 'shop';
+let pendingCheckoutAction = false;
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
@@ -949,6 +950,15 @@ function openCheckoutModal() {
     return;
   }
 
+  // Require Login or Registration before proceeding to Cash Bill
+  if (!currentUser) {
+    toggleCartDrawer(false);
+    pendingCheckoutAction = true;
+    showToast('🔑 Please Sign In or Register an account to proceed with Cash Bill!', 'warning');
+    openAuthModal('login');
+    return;
+  }
+
   const modal = document.getElementById('checkout-modal');
   if (!modal) return;
 
@@ -960,9 +970,9 @@ function openCheckoutModal() {
     const custPhoneInput = document.getElementById('cust-phone');
     const custAddressInput = document.getElementById('cust-address');
 
-    if (custNameInput && !custNameInput.value) custNameInput.value = currentUser.name || '';
-    if (custPhoneInput && !custPhoneInput.value) custPhoneInput.value = currentUser.phone || '';
-    if (custAddressInput && !custAddressInput.value) custAddressInput.value = currentUser.address || '';
+    if (custNameInput) custNameInput.value = currentUser.name || '';
+    if (custPhoneInput) custPhoneInput.value = currentUser.phone || '';
+    if (custAddressInput) custAddressInput.value = currentUser.address || '';
   }
 
   modal.classList.remove('hidden');
@@ -1599,7 +1609,15 @@ function handleCustomerLogin(event) {
       showToast(`Welcome back Store Keeper! 🔑`, 'success');
     } else {
       switchView('shop');
-      showToast(`Welcome back, ${currentUser.name}! 🛒`, 'success');
+      if (pendingCheckoutAction) {
+        pendingCheckoutAction = false;
+        showToast(`Signed in as ${currentUser.name}! Proceeding to Cash Bill... 🛒`, 'success');
+        setTimeout(() => {
+          openCheckoutModal();
+        }, 300);
+      } else {
+        showToast(`Welcome back, ${currentUser.name}! 🛒`, 'success');
+      }
     }
   } else {
     showToast('Invalid Email/Phone or Password! Please try again or Register.', 'error');

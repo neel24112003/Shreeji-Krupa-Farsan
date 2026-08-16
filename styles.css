@@ -145,10 +145,20 @@ select.glass-input option {
   transform: translateY(-2px);
 }
 
+/* Category Pills Horizontal Touch Scroll */
+#category-pills {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#category-pills::-webkit-scrollbar {
+  display: none;
+}
+
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: #070B14;
@@ -183,11 +193,20 @@ select.glass-input option {
 /* Mobile & Tablet Responsiveness Enhancements */
 @media (max-width: 640px) {
   .hero-title {
-    font-size: 2rem !important;
-    line-height: 2.4rem !important;
+    font-size: 1.75rem !important;
+    line-height: 2.2rem !important;
   }
   .modal-responsive {
     max-height: 92vh !important;
     overflow-y: auto !important;
+    padding: 1.1rem !important;
+  }
+  .glass-card {
+    border-radius: 1rem !important;
+  }
+  #toast-container {
+    left: 1rem !important;
+    right: 1rem !important;
+    max-width: none !important;
   }
 }
