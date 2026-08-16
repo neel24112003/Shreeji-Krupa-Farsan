@@ -191,10 +191,15 @@ select.glass-input option {
 }
 
 /* Mobile & Tablet Responsiveness Enhancements */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden !important;
+}
+
 @media (max-width: 640px) {
   .hero-title {
-    font-size: 1.75rem !important;
-    line-height: 2.2rem !important;
+    font-size: 1.65rem !important;
+    line-height: 2.1rem !important;
   }
   .modal-responsive {
     max-height: 92vh !important;
@@ -208,5 +213,10 @@ select.glass-input option {
     left: 1rem !important;
     right: 1rem !important;
     max-width: none !important;
+  }
+  .table-responsive-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }

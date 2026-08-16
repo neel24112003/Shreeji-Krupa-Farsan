@@ -573,23 +573,23 @@ function updateUserUIHeader() {
 
   if (currentUser) {
     if (currentUser.role === 'admin') {
-      roleBadge.innerHTML = `<span class="px-3 py-1 bg-purple-600/30 text-purple-200 border border-purple-400/40 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md">
-        <i class="fa-solid fa-user-shield text-xs text-purple-300"></i> ${currentUser.name} (Admin)
+      roleBadge.innerHTML = `<span class="px-2 py-0.5 sm:px-3 sm:py-1 bg-purple-600/30 text-purple-200 border border-purple-400/40 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 shadow-md whitespace-nowrap">
+        <i class="fa-solid fa-user-shield text-[10px] sm:text-xs text-purple-300"></i> <span class="hidden md:inline">${currentUser.name}</span> (Admin)
       </span>`;
       adminTabNav?.classList.remove('hidden');
     } else {
-      roleBadge.innerHTML = `<span class="px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md">
-        <i class="fa-solid fa-user text-xs text-amber-400"></i> ${currentUser.name}
+      roleBadge.innerHTML = `<span class="px-2 py-0.5 sm:px-3 sm:py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 shadow-md whitespace-nowrap">
+        <i class="fa-solid fa-user text-[10px] sm:text-xs text-amber-400"></i> ${currentUser.name.split(' ')[0]}
       </span>`;
       adminTabNav?.classList.add('hidden');
     }
 
-    authBtn.innerHTML = `<i class="fa-solid fa-right-from-bracket text-white"></i> Logout (${currentUser.name.split(' ')[0]})`;
+    authBtn.innerHTML = `<i class="fa-solid fa-right-from-bracket text-white"></i> <span class="hidden sm:inline">Logout (${currentUser.name.split(' ')[0]})</span><span class="sm:hidden">Logout</span>`;
     authBtn.onclick = logoutUser;
   } else {
     roleBadge.innerHTML = ``;
     adminTabNav?.classList.add('hidden');
-    authBtn.innerHTML = `<i class="fa-solid fa-user text-white"></i> Login / Access`;
+    authBtn.innerHTML = `<i class="fa-solid fa-user text-white"></i> <span class="hidden sm:inline">Login / Access</span><span class="sm:hidden">Login</span>`;
     authBtn.onclick = () => openAuthModal('login');
   }
 }
