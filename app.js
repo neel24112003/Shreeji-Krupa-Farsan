@@ -391,7 +391,19 @@ document.addEventListener('DOMContentLoaded', () => {
   loadData();
   setupEventListeners();
   renderApp();
+  
+  // Live Hero Digital Memo Clock
+  setInterval(updateHeroLiveClock, 1000);
+  updateHeroLiveClock();
 });
+
+function updateHeroLiveClock() {
+  const clockEl = document.getElementById('hero-live-clock');
+  if (clockEl) {
+    const now = new Date();
+    clockEl.innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+  }
+}
 
 // Initialize Persistent User Account Database with dual LocalStorage & SessionStorage backup
 function initUserDatabase() {
