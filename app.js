@@ -499,6 +499,14 @@ function loadData() {
   if (savedAuth) {
     try { currentUser = JSON.parse(savedAuth); } catch (e) { currentUser = null; }
   }
+
+  // Restore Active View across Page Refreshes for Store Manager / Admin
+  const savedView = localStorage.getItem('skf_active_view');
+  if (savedView) {
+    activeView = savedView;
+  } else if (currentUser && currentUser.role === 'admin') {
+    activeView = 'admin';
+  }
 }
 
 function saveProducts() {
@@ -568,13 +576,9 @@ function renderApp() {
   renderCategoryPills();
   renderProducts();
   updateCartBadge();
-  renderHeroCardCartButton();
 
-  if (activeView === 'admin') {
-    renderAdminDashboard();
-  } else if (activeView === 'orders') {
-    renderOrdersView();
-  }
+  // Ensure current active view (e.g. 'admin' or 'shop') is restored
+  switchView(activeView);
 }
 
 // Header UI update
@@ -642,6 +646,7 @@ function setupEventListeners() {
 // View Switcher
 function switchView(viewName) {
   activeView = viewName;
+  localStorage.setItem('skf_active_view', viewName);
   const shopSec = document.getElementById('shop-section');
   const adminSec = document.getElementById('admin-section');
   const ordersSec = document.getElementById('orders-section');
@@ -1784,6 +1789,7 @@ function handleAdminLogin(event) {
 function logoutUser() {
   currentUser = null;
   saveAuth();
+  localStorage.removeItem('skf_active_view');
   updateUserUIHeader();
   switchView('shop');
   showToast('Logged out successfully.', 'info');
