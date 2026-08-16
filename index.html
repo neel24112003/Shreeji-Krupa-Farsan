@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shreeji Krupa General Store & Farsan | Live Shop Inventory & Billing</title>
+  <meta name="description" content="Check real-time stock availability of Tikha Sev Mamra, Cold Drinks, Wafers, Biscuits, Chocolates, Khaman, and Sports Goods at Shreeji Krupa General Store. Get instant PDF cash bill receipts!">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandGold: '#F59E0B',
+            brandOrange: '#EA580C',
+            brandRed: '#DC2626',
+            brandPurple: '#8B5CF6',
+            brandCyan: '#06B6D4',
+            brandEmerald: '#10B981',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- External Libraries: jsPDF, jsPDF-AutoTable, Canvas Confetti -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-vibrant-gradient min-h-screen text-slate-100 flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
+
+  <!-- Header / Navigation Bar -->
+  <header class="sticky top-0 z-40 glass-nav">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="#" onclick="switchView('shop')" class="flex items-center gap-3 group">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-500 to-red-600 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-amber-500/30 group-hover:scale-105 transition-transform">
+          <i class="fa-solid fa-shop"></i>
+        </div>
+        <div>
+          <span class="text-lg sm:text-xl font-black tracking-tight text-white group-hover:text-amber-400 transition-colors flex items-center gap-1">
+            SHREEJI KRUPA <span class="text-amber-400 text-glow-gold">FARSAN</span>
+          </span>
+          <p class="text-[10px] text-amber-300 font-bold tracking-wider uppercase">General Store</p>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center gap-7 text-sm font-bold text-slate-200">
+        <a href="#" id="nav-shop" class="hover:text-amber-400 transition-colors flex items-center gap-1.5 py-1">
+          <i class="fa-solid fa-boxes-stacked text-amber-400"></i> Store Inventory
+        </a>
+        <a href="#" id="nav-orders" class="hover:text-amber-400 transition-colors flex items-center gap-1.5 py-1">
+          <i class="fa-solid fa-receipt text-cyan-400"></i> Past Bills & Receipts
+        </a>
+        <a href="#" id="nav-admin" class="hover:text-amber-400 transition-colors hidden flex items-center gap-1.5 py-1" id="admin-nav-item">
+          <i class="fa-solid fa-user-shield text-purple-400"></i> Stock Manager
+        </a>
+      </nav>
+
+      <!-- Right Header Actions -->
+      <div class="flex items-center gap-3">
+        
+        <!-- Live Role Indicator Badge -->
+        <div id="role-indicator">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Auth / Login Button -->
+        <button id="auth-btn" onclick="openAuthModal()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+          <i class="fa-solid fa-user text-white"></i> Login / Access
+        </button>
+
+        <!-- Cart Button -->
+        <button onclick="toggleCartDrawer(true)" class="btn-vibrant text-white px-4 py-2.5 rounded-xl font-black text-xs flex items-center gap-2 relative shadow-lg active:scale-95 transition-all">
+          <i class="fa-solid fa-cart-shopping text-white text-sm"></i>
+          <span class="hidden sm:inline text-white">My Cart</span>
+          <span id="cart-count-badge" class="w-5 h-5 bg-slate-950 text-amber-400 border border-amber-400/50 rounded-full text-[11px] font-black flex items-center justify-center animate-bounce">
+            0
+          </span>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero-banner" class="relative overflow-hidden py-8 md:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+    <div class="glass-card p-6 md:p-12 relative overflow-hidden border border-amber-500/25 shadow-2xl">
+      <div class="absolute -top-28 -left-28 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-28 -right-28 w-96 h-96 bg-cyan-600/15 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+        <div class="lg:col-span-7">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold mb-4">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> Real-Time Shop Inventory & Billing Portal
+          </div>
+
+          <h1 class="hero-title text-3xl sm:text-5xl font-black text-white leading-tight">
+            Check <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 text-glow-gold">Live Stock</span> & Get Instant Cash Bill!
+          </h1>
+
+          <p class="mt-4 text-sm sm:text-base text-slate-200 leading-relaxed font-medium">
+            Check real-time stock availability of Tikha Sev Mamra, Cold Drinks (Thums Up, Sprite, Maaza), Lay's/Wafers, Biscuits, Chocolates, fresh Khaman Dhokla, and Sports items in our store. Add to cart to generate your official PDF bill receipt!
+          </p>
+
+          <!-- Store Badges -->
+          <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-center">
+              <i class="fa-solid fa-bowl-rice text-amber-400 text-lg mb-1"></i>
+              <p class="text-xs font-extrabold text-white">Tikha Sev Mamra</p>
+              <p class="text-[10px] text-slate-300">Fresh Chatpata</p>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-center">
+              <i class="fa-solid fa-file-pdf text-red-400 text-lg mb-1"></i>
+              <p class="text-xs font-extrabold text-white">Colorful PDF Bill</p>
+              <p class="text-[10px] text-slate-300">Instant Cash Memo</p>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-center">
+              <i class="fa-solid fa-bottle-water text-cyan-400 text-lg mb-1"></i>
+              <p class="text-xs font-extrabold text-white">Cold Drinks 2L</p>
+              <p class="text-[10px] text-slate-300">Chilled & Ready</p>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-center">
+              <i class="fa-solid fa-store text-emerald-400 text-lg mb-1"></i>
+              <p class="text-xs font-extrabold text-white">Live Stock Meter</p>
+              <p class="text-[10px] text-slate-300">Real-Time Count</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Featured Product Preview -->
+        <div class="lg:col-span-5 flex justify-center">
+          <div class="relative w-full max-w-sm">
+            <div class="glass-card p-4 border border-amber-500/40 floating-element shadow-2xl">
+              <div class="relative rounded-xl overflow-hidden mb-3">
+                <img id="hero-img-preview" src="" alt="Special Nylon Khaman Dhokla" class="w-full h-48 object-cover">
+                <span class="absolute top-2 left-2 px-2.5 py-1 bg-amber-500 text-slate-950 font-black text-[11px] rounded-lg shadow-md uppercase">Fresh Morning Batch</span>
+                <span class="absolute top-2 right-2 px-2 py-0.5 bg-emerald-500/90 text-slate-950 font-black text-[10px] rounded-lg">25 Units Ready</span>
+              </div>
+              
+              <!-- Clean Layout -->
+              <div class="space-y-3">
+                <div>
+                  <h4 class="text-sm font-bold text-white leading-snug">Special Nylon Khaman Dhokla</h4>
+                  <div class="flex items-center gap-2 mt-1.5">
+                    <span class="text-lg font-black text-amber-400 text-glow-gold">₹160</span>
+                    <span class="text-xs text-slate-400 line-through">₹200</span>
+                    <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">SAVE ₹40</span>
+                  </div>
+                </div>
+                <div id="hero-cart-btn-container">
+                  <button onclick="handleAddToCart('p16')" class="w-full btn-vibrant text-white text-xs font-black py-2.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg">
+                    <i class="fa-solid fa-cart-plus text-white text-sm"></i> Add to Cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1">
+    
+    <!-- SHOP MENU SECTION -->
+    <section id="shop-section" class="space-y-6">
+      
+      <!-- Filter Pills & Search -->
+      <div class="glass-card p-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        
+        <!-- Category Pills Slider -->
+        <div id="category-pills" class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Search & Sort Controls -->
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <div class="relative flex-1 md:w-64">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="search-input" placeholder="Search Khaman, Mamra, Bat, Thums Up, Lay's..." class="glass-input pl-9 pr-3 py-2 rounded-xl text-xs w-full">
+          </div>
+
+          <select id="sort-select" class="glass-input px-3 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white border border-slate-700">
+            <option value="default">Sort by: Default</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="rating">Top Rated</option>
+            <option value="stock">High Stock First</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Products Inventory Grid -->
+      <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Dynamically rendered via app.js -->
+      </div>
+    </section>
+
+    <!-- ORDERS & PAST BILLS SECTION -->
+    <section id="orders-section" class="hidden space-y-6">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div>
+          <h2 class="text-2xl font-black text-white flex items-center gap-2">
+            <i class="fa-solid fa-receipt text-cyan-400"></i> Store Bills & Receipts History
+          </h2>
+          <p class="text-xs text-slate-300 mt-1">View past store purchases and re-download PDF cash receipts anytime.</p>
+        </div>
+        <button onclick="switchView('shop')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl">
+          ← Back to Inventory
+        </button>
+      </div>
+
+      <div id="orders-list-container" class="space-y-4">
+        <!-- Dynamically rendered orders -->
+      </div>
+    </section>
+
+    <!-- STORE MANAGEMENT (ADMIN) SECTION -->
+    <section id="admin-section" class="hidden space-y-6">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div>
+          <h2 class="text-2xl font-black text-white flex items-center gap-2">
+            <i class="fa-solid fa-user-shield text-purple-400"></i> Store Stock Management Portal
+          </h2>
+          <p class="text-xs text-slate-300 mt-1">Modify live stock levels when new stock arrives at shop, add products, or manage inventory.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="openAddProductModal()" class="btn-cyan text-white px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2">
+            <i class="fa-solid fa-plus text-white"></i> Add New Shop Item
+          </button>
+          <button onclick="switchView('shop')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl">
+            ← Customer View
+          </button>
+        </div>
+      </div>
+
+      <!-- Real-time Analytics Cards -->
+      <div id="admin-analytics" class="w-full">
+        <!-- Dynamically rendered -->
+      </div>
+
+      <!-- Products Inventory Table -->
+      <div class="glass-card p-6 border border-slate-800">
+        <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-boxes-stacked text-amber-400"></i> Live Shop Inventory Table
+        </h3>
+        <div id="admin-products-table">
+          <!-- Dynamically rendered table -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 bg-slate-950/90 backdrop-blur-md py-8 mt-12">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div>
+        <p class="font-bold text-slate-200">© 2026 Shreeji Krupa General Store & Farsan. All Rights Reserved.</p>
+        <p class="mt-0.5 text-[11px] text-slate-400">Tikha Sev Mamra, Cold Drinks, Wafers, Biscuits, Chocolates, Khaman & Sports Equipment.</p>
+      </div>
+      <div class="flex items-center gap-4 text-slate-300 text-xs">
+        <a href="#" onclick="openAuthModal('admin')" class="hover:text-amber-400 transition-colors flex items-center gap-1 font-bold">
+          <i class="fa-solid fa-lock text-[10px]"></i> Store Keeper Access
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- CART SLIDE-OVER DRAWER -->
+  <div id="cart-backdrop" onclick="toggleCartDrawer(false)" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden transition-opacity"></div>
+  
+  <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-slate-900 border-l border-slate-800 z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between shadow-2xl">
+    
+    <!-- Drawer Header -->
+    <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-cart-shopping text-amber-400 text-lg"></i>
+        <h3 class="text-base font-black text-white">Selected Items (<span id="cart-drawer-count">0</span>)</h3>
+      </div>
+      <button onclick="toggleCartDrawer(false)" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors">
+        &times;
+      </button>
+    </div>
+
+    <!-- Drawer Items List -->
+    <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-3">
+      <!-- Dynamically populated -->
+    </div>
+
+    <!-- Drawer Footer / Summary (No GST tax calculation as requested) -->
+    <div class="p-5 border-t border-slate-800 bg-slate-950/80 space-y-3">
+      <div class="space-y-1.5 text-xs text-slate-300">
+        <div class="flex justify-between">
+          <span>Items Total:</span>
+          <span id="cart-subtotal" class="font-bold text-white">₹0</span>
+        </div>
+        <div class="flex justify-between text-sm font-black text-white pt-2 border-t border-slate-800">
+          <span>Grand Total Bill:</span>
+          <span id="cart-grand-total" class="text-amber-400 text-base text-glow-gold">₹0</span>
+        </div>
+      </div>
+
+      <button id="checkout-btn" onclick="openCheckoutModal()" disabled class="w-full btn-vibrant text-white py-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+        <i class="fa-solid fa-file-invoice text-white"></i> Proceed to Cash Bill
+      </button>
+    </div>
+  </div>
+
+  <!-- CHECKOUT & BILL MODAL -->
+  <div id="checkout-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full p-6 border border-amber-500/40 relative modal-responsive">
+      <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">&times;</button>
+      
+      <h3 class="text-xl font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-receipt text-amber-400"></i> Generate Cash Bill Receipt
+      </h3>
+      <p class="text-xs text-slate-300 mt-1">Enter your billing details to generate your official PDF invoice.</p>
+
+      <form onsubmit="handlePlaceOrder(event)" class="mt-5 space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-200 mb-1">Customer Full Name</label>
+          <input type="text" id="cust-name" required placeholder="e.g. Nayan Patel" class="glass-input w-full p-2.5 rounded-xl">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-200 mb-1">Phone Number</label>
+          <input type="tel" id="cust-phone" required placeholder="e.g. +91 98765 43210" class="glass-input w-full p-2.5 rounded-xl">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-200 mb-1">Delivery / Pickup Address</label>
+          <textarea id="cust-address" required rows="2" placeholder="House/Flat No, Society, Area, City" class="glass-input w-full p-2.5 rounded-xl"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-200 mb-1">Payment Method</label>
+          <select id="cust-payment" class="glass-input w-full p-2.5 rounded-xl bg-slate-900 text-white font-semibold">
+            <option value="UPI / QR Code">UPI (GPay / PhonePe / Paytm)</option>
+            <option value="Cash at Store">Cash at Store / COD</option>
+            <option value="Credit/Debit Card">Credit / Debit Card</option>
+          </select>
+        </div>
+
+        <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 flex justify-between items-center text-white font-bold">
+          <span>Total Amount Payable:</span>
+          <span id="checkout-summary-total" class="text-amber-400 text-base font-black">₹0</span>
+        </div>
+
+        <button type="submit" class="w-full btn-vibrant text-white py-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+          <i class="fa-solid fa-file-pdf text-white"></i> Confirm Order & Generate PDF Bill
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- RECEIPT MODAL -->
+  <div id="receipt-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full p-6 border border-emerald-500/40 relative modal-responsive">
+      <button onclick="closeReceiptModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">&times;</button>
+      
+      <div class="text-center">
+        <div class="w-12 h-12 mx-auto bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 text-xl mb-2 border border-emerald-500/40">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h3 class="text-xl font-black text-white">Bill Generated & Stock Reserved!</h3>
+        <p class="text-xs text-slate-300 mt-1">Your order has been confirmed and items reserved in store inventory.</p>
+      </div>
+
+      <div id="receipt-details-content" class="mt-4">
+        <!-- Dynamically rendered -->
+      </div>
+
+      <div class="mt-5 flex gap-3">
+        <button id="download-pdf-btn" class="flex-1 btn-cyan text-white py-2.5 rounded-xl font-black text-xs flex items-center justify-center gap-2">
+          <i class="fa-solid fa-file-pdf text-white"></i> Download PDF Bill Receipt
+        </button>
+        <button onclick="closeReceiptModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD PRODUCT MODAL (ADMIN) -->
+  <div id="add-product-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full p-6 border border-cyan-500/40 relative modal-responsive">
+      <button onclick="closeAddProductModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">&times;</button>
+      
+      <h3 class="text-xl font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-plus-circle text-cyan-400"></i> Add New Product to Store Stock
+      </h3>
+
+      <form onsubmit="handleCreateProduct(event)" class="mt-4 space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-200 mb-1">Product Title</label>
+          <input type="text" id="prod-title" required placeholder="e.g. Kolhapuri Tikha Mamra 500g" class="glass-input w-full p-2.5 rounded-xl">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-200 mb-1">Category</label>
+            <select id="prod-category" class="glass-input w-full p-2.5 rounded-xl bg-slate-900 text-white font-semibold">
+              <option value="mamra">Tikha Sev Mamra</option>
+              <option value="colddrinks">Cold Drinks</option>
+              <option value="wafers">Wafers & Chips</option>
+              <option value="biscuits">Biscuits & Cookies</option>
+              <option value="chocolates">Chocolates</option>
+              <option value="farsan">Khaman & Farsan</option>
+              <option value="sweets">Sweets</option>
+              <option value="sports">Sports & Games</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-200 mb-1">Unit / Pack Size</label>
+            <input type="text" id="prod-unit" placeholder="e.g. 500g Pack / 2 Litre" class="glass-input w-full p-2.5 rounded-xl">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block font-bold text-slate-200 mb-1">Selling Price (₹)</label>
+            <input type="number" id="prod-price" required min="1" placeholder="60" class="glass-input w-full p-2.5 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-200 mb-1">MRP Price (₹)</label>
+            <input type="number" id="prod-mrp" min="1" placeholder="75" class="glass-input w-full p-2.5 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-200 mb-1">Initial Stock Qty</label>
+            <input type="number" id="prod-stock" required min="0" placeholder="50" class="glass-input w-full p-2.5 rounded-xl">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-200 mb-1">Image URL</label>
+          <input type="url" id="prod-image" placeholder="https://images.unsplash.com/..." class="glass-input w-full p-2.5 rounded-xl">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-200 mb-1">Description</label>
+          <textarea id="prod-desc" rows="2" placeholder="Brief description of brand, size, flavor, or specs." class="glass-input w-full p-2.5 rounded-xl"></textarea>
+        </div>
+
+        <button type="submit" class="w-full btn-cyan text-white py-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+          <i class="fa-solid fa-floppy-disk text-white"></i> Save Item to Store Inventory
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT PRODUCT MODAL (ADMIN) -->
+  <div id="edit-product-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full p-6 border border-amber-500/40 relative modal-responsive max-h-[90vh] overflow-y-auto">
+      <button onclick="closeEditProductModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">&times;</button>
+      
+      <h3 class="text-xl font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Store Product Details
+      </h3>
+      <p class="text-xs text-slate-300 mt-1">Modify product title, image URL, category, price, or stock.</p>
+
+      <form onsubmit="handleSaveEditedProduct(event)" class="mt-4 space-y-3 text-xs">
+        <input type="hidden" id="edit-prod-id">
+
+        <div>
+          <label class="block font-bold text-slate-200 mb-1">Product Title</label>
+          <input type="text" id="edit-prod-title" required class="glass-input w-full p-2.5 rounded-xl">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-200 mb-1">Category</label>
+            <select id="edit-prod-category" class="glass-input w-full p-2.5 rounded-xl bg-slate-900 text-white font-semibold">
+              <option value="mamra">Tikha Sev Mamra</option>
+              <option value="colddrinks">Cold Drinks</option>
+              <option value="wafers">Wafers & Chips</option>
+              <option value="biscuits">Biscuits & Cookies</option>
+              <option value="chocolates">Chocolates</option>
+              <option value="farsan">Khaman & Farsan</option>
+              <option value="sweets">Sweets</option>
+              <option value="sports">Sports & Games</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-200 mb-1">Unit / Pack Size</label>
+            <input type="text" id="edit-prod-unit" required class="glass-input w-full p-2.5 rounded-xl">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block font-bold text-slate-200 mb-1">Selling Price (₹)</label>
+            <input type="number" id="edit-prod-price" required min="1" class="glass-input w-full p-2.5 rounded-xl">
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-200 mb-1">MRP Price (₹)</label>
+            <input type="number" id="edit-prod-mrp" required min="1" class="glass-input w-full p-2.5 rounded-xl">
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-200 mb-1">Live Stock Qty</label>
+            <input type="number" id="edit-prod-stock" required min="0" class="glass-input w-full p-2.5 rounded-xl">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-200 mb-1">Badge Tag</label>
+          <input type="text" id="edit-prod-badge" placeholder="e.g. Bestseller / Hot Item" class="glass-input w-full p-2.5 rounded-xl">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-200 mb-1">Image URL / Base64</label>
+          <input type="text" id="edit-prod-image" required class="glass-input w-full p-2.5 rounded-xl text-xs font-mono">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-200 mb-1">Description</label>
+          <textarea id="edit-prod-desc" rows="2" class="glass-input w-full p-2.5 rounded-xl"></textarea>
+        </div>
+
+        <button type="submit" class="w-full btn-vibrant text-white py-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg">
+          <i class="fa-solid fa-floppy-disk text-white"></i> Save Changes & Sync Live
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATION MODAL (Customer Login, Registration & Admin Portal) -->
+  <div id="auth-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full p-6 border border-amber-500/40 relative modal-responsive shadow-2xl">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">&times;</button>
+      
+      <!-- Modal Header -->
+      <div class="text-center mb-5">
+        <div class="w-12 h-12 mx-auto bg-amber-500/20 rounded-full flex items-center justify-center text-amber-400 text-xl mb-2 border border-amber-500/40">
+          <i class="fa-solid fa-user-lock text-amber-400"></i>
+        </div>
+        <h3 class="text-xl font-black text-white">Shreeji Krupa Portal</h3>
+        <p class="text-xs text-slate-300">Sign in to manage cart, orders, or store inventory.</p>
+      </div>
+
+      <!-- Auth Sub-Tabs -->
+      <div class="flex border-b border-slate-800 mb-5 text-xs font-bold text-slate-400">
+        <button id="tab-btn-login" onclick="switchAuthTab('login')" class="flex-1 py-2.5 text-center text-amber-400 border-b-2 border-amber-400 transition-colors">
+          <i class="fa-solid fa-right-to-bracket text-amber-400"></i> Login
+        </button>
+        <button id="tab-btn-register" onclick="switchAuthTab('register')" class="flex-1 py-2.5 text-center hover:text-white border-b-2 border-transparent transition-colors">
+          <i class="fa-solid fa-user-plus text-amber-400"></i> Register
+        </button>
+        <button id="tab-btn-admin" onclick="switchAuthTab('admin')" class="flex-1 py-2.5 text-center hover:text-purple-300 border-b-2 border-transparent transition-colors">
+          <i class="fa-solid fa-user-shield text-purple-400"></i> Admin Portal
+        </button>
+      </div>
+
+      <!-- 1. Customer Login Form -->
+      <form id="form-customer-login" onsubmit="handleCustomerLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-200 mb-1">Email or Phone Number</label>
+          <input type="text" id="login-identifier" required placeholder="customer@shreejikrupa.com or 9876543210" class="glass-input w-full p-2.5 rounded-xl text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-200 mb-1">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="glass-input w-full p-2.5 rounded-xl text-xs">
+        </div>
+        <div class="flex items-center justify-between text-[11px] text-slate-300">
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" checked class="rounded border-slate-700 bg-slate-900 text-amber-500"> Remember Me
+          </label>
+          <span class="text-amber-400 hover:underline cursor-pointer">Forgot Password?</span>
+        </div>
+        <button type="submit" class="w-full btn-vibrant text-white py-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+          <i class="fa-solid fa-right-to-bracket text-white"></i> Sign In to Customer Account
+        </button>
+        <p class="text-[11px] text-center text-slate-400">Don't have an account? <span onclick="switchAuthTab('register')" class="text-amber-400 font-bold hover:underline cursor-pointer">Register Now</span></p>
+      </form>
+
+      <!-- 2. Customer Registration Form -->
+      <form id="form-customer-register" onsubmit="handleCustomerRegister(event)" class="space-y-3 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-200 mb-1">Full Name</label>
+          <input type="text" id="reg-name" required placeholder="e.g. Nayan Patel" class="glass-input w-full p-2.5 rounded-xl text-xs">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-slate-200 mb-1">Email Address</label>
+            <input type="email" id="reg-email" required placeholder="nayan@example.com" class="glass-input w-full p-2.5 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-200 mb-1">Phone Number</label>
+            <input type="tel" id="reg-phone" required placeholder="9876543210" class="glass-input w-full p-2.5 rounded-xl text-xs">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-200 mb-1">Delivery Address</label>
+          <input type="text" id="reg-address" required placeholder="House No, Street Name, City" class="glass-input w-full p-2.5 rounded-xl text-xs">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-slate-200 mb-1">Password</label>
+            <input type="password" id="reg-pass" required minlength="4" placeholder="••••••••" class="glass-input w-full p-2.5 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-200 mb-1">Confirm Pass</label>
+            <input type="password" id="reg-confirm-pass" required minlength="4" placeholder="••••••••" class="glass-input w-full p-2.5 rounded-xl text-xs">
+          </div>
+        </div>
+        <button type="submit" class="w-full btn-cyan text-white py-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-2">
+          <i class="fa-solid fa-user-check text-white"></i> Create Account & Sign In
+        </button>
+      </form>
+
+      <!-- 3. Store Keeper / Admin Login Form -->
+      <form id="form-admin-login" onsubmit="handleAdminLogin(event)" class="space-y-4 hidden">
+        <div class="bg-purple-950/40 p-3 rounded-xl border border-purple-500/30 text-[11px] text-purple-200 flex items-center gap-2">
+          <i class="fa-solid fa-key text-purple-400 text-sm"></i>
+          <span>Default Admin Credentials: <b>admin@shreejikrupa.com</b> / Pass: <b>admin123</b></span>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-200 mb-1">Admin ID / Email</label>
+          <input type="text" id="admin-identifier" required value="admin@shreejikrupa.com" class="glass-input w-full p-2.5 rounded-xl text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-200 mb-1">Admin Password</label>
+          <input type="password" id="admin-password" required value="admin123" class="glass-input w-full p-2.5 rounded-xl text-xs">
+        </div>
+        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white py-3 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg">
+          <i class="fa-solid fa-user-shield text-white"></i> Access Admin Dashboard
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 max-w-sm pointer-events-none"></div>
+
+  <!-- Application JS -->
+  <script src="product_images.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
