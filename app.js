@@ -1398,23 +1398,30 @@ function renderOrdersView() {
 function renderAdminDashboard() {
   const analyticsContainer = document.getElementById('admin-analytics');
   const productsTableContainer = document.getElementById('admin-products-table');
+  const usersTableContainer = document.getElementById('admin-users-table');
+  const usersCountBadge = document.getElementById('users-count-badge');
 
   if (!analyticsContainer || !productsTableContainer) return;
 
   const totalRevenue = orders.reduce((sum, o) => sum + o.grandTotal, 0);
   const totalOrdersCount = orders.length;
+  const registeredUsersCount = usersDb.filter(u => u && u.role !== 'admin').length;
   const lowStockCount = products.filter(p => p.stock <= 8).length;
   const outOfStockCount = products.filter(p => p.stock === 0).length;
 
   analyticsContainer.innerHTML = `
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
       <div class="glass-card p-4 border border-amber-500/30">
-        <p class="text-xs text-slate-300 font-semibold">Store Billing Revenue</p>
+        <p class="text-xs text-slate-300 font-semibold">Billing Revenue</p>
         <h3 class="text-2xl font-black text-amber-400 text-glow-gold mt-1">₹${totalRevenue}</h3>
       </div>
       <div class="glass-card p-4 border border-cyan-500/30">
         <p class="text-xs text-slate-300 font-semibold">Bills Issued</p>
         <h3 class="text-2xl font-black text-cyan-400 mt-1">${totalOrdersCount}</h3>
+      </div>
+      <div class="glass-card p-4 border border-purple-500/30">
+        <p class="text-xs text-slate-300 font-semibold">Registered Users</p>
+        <h3 class="text-2xl font-black text-purple-400 mt-1">${registeredUsersCount}</h3>
       </div>
       <div class="glass-card p-4 border border-amber-500/30">
         <p class="text-xs text-slate-300 font-semibold">Low Stock Alerts</p>
@@ -1444,7 +1451,7 @@ function renderAdminDashboard() {
           ${products.map(p => `
             <tr class="hover:bg-slate-800/60 transition-colors">
               <td class="p-3 flex items-center gap-3">
-                <img src="${p.image}" class="w-10 h-10 object-cover rounded-lg bg-slate-900">
+                <img src="${p.image}" class="w-10 h-10 object-cover rounded-lg bg-slate-900 border border-slate-700">
                 <div>
                   <p class="font-bold text-white line-clamp-1">${p.title}</p>
                   <p class="text-[10px] text-slate-400">${p.id}</p>
@@ -1477,6 +1484,142 @@ function renderAdminDashboard() {
       </table>
     </div>
   `;
+
+  // Render Registered Users Directory Table
+  if (usersTableContainer) {
+    const customerUsers = usersDb.filter(u => u && u.role !== 'admin');
+    if (usersCountBadge) usersCountBadge.innerText = `${customerUsers.length} Registered Customers`;
+
+    if (customerUsers.length === 0) {
+      usersTableContainer.innerHTML = `
+        <div class="text-center py-8 text-slate-400 text-xs">
+          No registered customer accounts found yet.
+        </div>
+      `;
+    } else {
+      usersTableContainer.innerHTML = `
+        <table class="w-full text-left text-xs text-slate-200">
+          <thead class="bg-slate-900 text-slate-300 uppercase text-[10px] tracking-wider border-b border-slate-800">
+            <tr>
+              <th class="p-3">Customer Name</th>
+              <th class="p-3">Contact Email & Phone</th>
+              <th class="p-3">Saved Address</th>
+              <th class="p-3">Orders Placed</th>
+              <th class="p-3">Total Spent</th>
+              <th class="p-3 text-right">User Activity & History</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800">
+            ${customerUsers.map(u => {
+              const uEmail = (u.email || '').toLowerCase();
+              const uPhone = (u.phone || '').trim();
+              const uName = (u.name || 'Customer').trim();
+
+              const userOrders = orders.filter(o => {
+                const oPhone = (o.phone || '').trim();
+                const oName = (o.customer?.name || o.name || '').trim().toLowerCase();
+                return oPhone === uPhone || oName === uName.toLowerCase();
+              });
+
+              const userSpent = userOrders.reduce((sum, o) => sum + o.grandTotal, 0);
+
+              return `
+                <tr class="hover:bg-slate-800/60 transition-colors">
+                  <td class="p-3 font-bold text-white">
+                    <div class="flex items-center gap-2">
+                      <div class="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 font-black text-xs flex items-center justify-center shrink-0">
+                        ${uName.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p class="leading-snug text-white">${uName}</p>
+                        <span class="text-[10px] text-emerald-400 font-semibold">Registered User</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="p-3">
+                    <p class="font-semibold text-white">${uEmail}</p>
+                    <p class="text-[10px] text-slate-400 font-mono">${uPhone}</p>
+                  </td>
+                  <td class="p-3 text-slate-300 max-w-xs truncate">${u.address || 'Main Market, City'}</td>
+                  <td class="p-3 font-bold text-white font-mono">${userOrders.length} Bills</td>
+                  <td class="p-3 font-black text-amber-400">₹${userSpent}</td>
+                  <td class="p-3 text-right">
+                    <button onclick="viewCustomerOrderHistory('${uPhone}', '${uName.replace(/'/g, "\\'")}')" class="px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 rounded-xl font-bold text-[11px] active:scale-95 transition-all">
+                      🔍 View Purchased Items (${userOrders.length})
+                    </button>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+  }
+}
+
+// View Customer Specific Order History Modal Handler
+function viewCustomerOrderHistory(userPhone, userName) {
+  const modal = document.getElementById('customer-orders-modal');
+  const titleEl = document.getElementById('cust-orders-title');
+  const subtitleEl = document.getElementById('cust-orders-subtitle');
+  const contentEl = document.getElementById('cust-orders-content');
+
+  if (!modal || !contentEl) return;
+
+  const userOrders = orders.filter(o => {
+    const oPhone = (o.phone || '').trim();
+    const oName = (o.customer?.name || o.name || '').trim().toLowerCase();
+    return oPhone === userPhone || oName === userName.toLowerCase();
+  });
+
+  titleEl.innerText = `Purchase History: ${userName}`;
+  subtitleEl.innerText = `Phone: ${userPhone} • Total ${userOrders.length} Orders Placed`;
+
+  if (userOrders.length === 0) {
+    contentEl.innerHTML = `
+      <div class="text-center py-8 bg-slate-900/60 rounded-xl border border-slate-800">
+        <i class="fa-solid fa-receipt text-slate-600 text-3xl mb-2"></i>
+        <p class="text-xs font-bold text-slate-300">No orders placed by this customer yet.</p>
+      </div>
+    `;
+  } else {
+    contentEl.innerHTML = userOrders.map(o => `
+      <div class="glass-card p-4 border border-slate-800 space-y-3">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-800 text-xs">
+          <div>
+            <span class="font-mono font-bold text-amber-400">Bill #${o.id}</span>
+            <p class="text-[10px] text-slate-400 mt-0.5">${o.date}</p>
+          </div>
+          <div class="text-right">
+            <span class="text-sm font-black text-amber-400">₹${o.grandTotal}</span>
+            <p class="text-[10px] text-emerald-400 font-bold">${o.paymentMethod || 'UPI / Cash'}</p>
+          </div>
+        </div>
+
+        <div class="space-y-1.5 text-xs">
+          ${o.items.map(item => `
+            <div class="flex justify-between items-center text-slate-300">
+              <span>${item.title} <strong class="text-white">x${item.qty}</strong></span>
+              <span class="font-semibold text-white">₹${item.price * item.qty}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="pt-2 flex justify-end">
+          <button onclick='downloadPDFReceipt(${JSON.stringify(o)})' class="px-3 py-1 bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/40 rounded-lg font-bold text-[10px] flex items-center gap-1 active:scale-95 transition-all">
+            <i class="fa-solid fa-file-pdf"></i> Download PDF Receipt
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  modal.classList.remove('hidden');
+}
+
+function closeCustomerOrdersModal() {
+  document.getElementById('customer-orders-modal')?.classList.add('hidden');
 }
 
 // Edit Product Handlers (Store Manager)
