@@ -144,83 +144,106 @@
           </div>
         </div>
 
-        <!-- Live Store Overview & Real-time Billing Dashboard Card -->
+        <!-- Interactive 1-Click Express Store Combos Widget -->
         <div class="lg:col-span-5 flex justify-center">
           <div class="relative w-full max-w-md">
             <div class="glass-card p-5 sm:p-6 border border-amber-500/40 floating-element shadow-2xl space-y-4">
               
-              <!-- Mini Live Cash Memo Preview Header -->
-              <div class="p-3 bg-slate-950/90 rounded-xl border border-amber-500/30 flex items-center justify-between">
+              <!-- Widget Header -->
+              <div class="flex items-center justify-between pb-3 border-b border-slate-800">
                 <div class="flex items-center gap-2.5">
-                  <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500 via-orange-500 to-red-600 flex items-center justify-center text-slate-950 font-black text-sm shadow-md">
-                    <i class="fa-solid fa-receipt"></i>
+                  <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 via-orange-500 to-red-600 flex items-center justify-center text-slate-950 font-black text-sm shadow-md">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
                   </div>
                   <div>
-                    <h4 class="text-xs font-black text-white flex items-center gap-1.5 leading-none">
-                      SHREEJI KRUPA MEMO <span class="text-[9px] px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded font-mono">LIVE</span>
-                    </h4>
-                    <p class="text-[10px] text-slate-400 font-mono mt-0.5">Inv #SKF-2026-LIVE</p>
+                    <h4 class="text-xs font-black text-white uppercase tracking-wider">1-Click Express Combos</h4>
+                    <p class="text-[10px] text-amber-400 font-semibold">Instant Bundle Packs & Savings</p>
                   </div>
                 </div>
-                <div class="text-right">
-                  <span id="hero-live-clock" class="text-xs font-black text-amber-400 block font-mono">--:--:--</span>
-                  <span class="text-[9px] text-emerald-400 font-bold flex items-center gap-1 justify-end">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Instant PDF
-                  </span>
-                </div>
+                <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/30 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Live Combos
+                </span>
               </div>
 
-              <!-- Feature Grid: 4 Pillars of Shreeji Krupa Farsan -->
-              <div class="grid grid-cols-2 gap-2.5 text-xs">
-                <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1">
-                  <div class="flex items-center justify-between">
-                    <i class="fa-solid fa-boxes-stacked text-amber-400 text-sm"></i>
-                    <span class="text-[9px] font-bold text-amber-300 bg-amber-500/10 px-1.5 py-0.5 rounded">24 Categories</span>
+              <!-- Quick Preset Combos List -->
+              <div class="space-y-2.5">
+                
+                <!-- Combo 1 -->
+                <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 transition-all flex items-center justify-between gap-3 group">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-black text-lg shrink-0 group-hover:scale-110 transition-transform">
+                      🥣
+                    </div>
+                    <div>
+                      <h5 class="text-xs font-black text-white group-hover:text-amber-400 transition-colors">Morning Farsan Pack</h5>
+                      <p class="text-[10px] text-slate-400">1kg Khaman + 1kg Ratlami Sev</p>
+                    </div>
                   </div>
-                  <p class="text-xs font-black text-white">Live Stock Meter</p>
-                  <p class="text-[10px] text-slate-400">Real-time inventory counter</p>
+                  <div class="text-right shrink-0">
+                    <span class="text-xs font-black text-amber-400 block">₹400</span>
+                    <button onclick="addComboToCart(['p16', 'p17'])" class="mt-1 px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 text-[10px] font-black rounded-lg active:scale-95 transition-all shadow-md">
+                      + Add Pack
+                    </button>
+                  </div>
                 </div>
 
-                <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1">
-                  <div class="flex items-center justify-between">
-                    <i class="fa-solid fa-file-pdf text-red-400 text-sm"></i>
-                    <span class="text-[9px] font-bold text-red-300 bg-red-500/10 px-1.5 py-0.5 rounded">Instant PDF</span>
+                <!-- Combo 2 -->
+                <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-cyan-500/50 transition-all flex items-center justify-between gap-3 group">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-black text-lg shrink-0 group-hover:scale-110 transition-transform">
+                      🥤
+                    </div>
+                    <div>
+                      <h5 class="text-xs font-black text-white group-hover:text-cyan-400 transition-colors">Chilled Refreshment Pack</h5>
+                      <p class="text-[10px] text-slate-400">Thums Up 2L + Red Bull Can</p>
+                    </div>
                   </div>
-                  <p class="text-xs font-black text-white">Color Cash Bill</p>
-                  <p class="text-[10px] text-slate-400">Official shop memo print</p>
+                  <div class="text-right shrink-0">
+                    <span class="text-xs font-black text-cyan-400 block">₹215</span>
+                    <button onclick="addComboToCart(['p5', 'p8'])" class="mt-1 px-2.5 py-1 bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-[10px] font-black rounded-lg active:scale-95 transition-all shadow-md">
+                      + Add Pack
+                    </button>
+                  </div>
                 </div>
 
-                <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1">
-                  <div class="flex items-center justify-between">
-                    <i class="fa-solid fa-qrcode text-cyan-400 text-sm"></i>
-                    <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/10 px-1.5 py-0.5 rounded">GPay / Cash</span>
+                <!-- Combo 3 -->
+                <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/50 transition-all flex items-center justify-between gap-3 group">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-black text-lg shrink-0 group-hover:scale-110 transition-transform">
+                      🍿
+                    </div>
+                    <div>
+                      <h5 class="text-xs font-black text-white group-hover:text-emerald-400 transition-colors">Chatpata Evening Snacks</h5>
+                      <p class="text-[10px] text-slate-400">Tikha Sev Mamra + Plain Mamra</p>
+                    </div>
                   </div>
-                  <p class="text-xs font-black text-white">UPI & Cash Pay</p>
-                  <p class="text-[10px] text-slate-400">GPay, PhonePe & Paytm</p>
+                  <div class="text-right shrink-0">
+                    <span class="text-xs font-black text-emerald-400 block">₹100</span>
+                    <button onclick="addComboToCart(['p1', 'p2'])" class="mt-1 px-2.5 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-[10px] font-black rounded-lg active:scale-95 transition-all shadow-md">
+                      + Add Pack
+                    </button>
+                  </div>
                 </div>
 
-                <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1">
-                  <div class="flex items-center justify-between">
-                    <i class="fa-solid fa-medal text-emerald-400 text-sm"></i>
-                    <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/10 px-1.5 py-0.5 rounded">Fresh Batch</span>
+                <!-- Combo 4 -->
+                <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-purple-500/50 transition-all flex items-center justify-between gap-3 group">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 font-black text-lg shrink-0 group-hover:scale-110 transition-transform">
+                      🏸
+                    </div>
+                    <div>
+                      <h5 class="text-xs font-black text-white group-hover:text-purple-400 transition-colors">Weekend Sports Kit</h5>
+                      <p class="text-[10px] text-slate-400">Yonex Rackets + Shuttlecock Box</p>
+                    </div>
                   </div>
-                  <p class="text-xs font-black text-white">Daily Fresh Farsan</p>
-                  <p class="text-[10px] text-slate-400">100% Quality Guaranteed</p>
+                  <div class="text-right shrink-0">
+                    <span class="text-xs font-black text-purple-400 block">₹1649</span>
+                    <button onclick="addComboToCart(['p22', 'p23'])" class="mt-1 px-2.5 py-1 bg-purple-500 hover:bg-purple-400 text-slate-950 text-[10px] font-black rounded-lg active:scale-95 transition-all shadow-md">
+                      + Add Pack
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <!-- Store Timing & Action Bar -->
-              <div class="p-3 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10 border border-amber-500/30 flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
-                  <i class="fa-solid fa-store text-amber-400 text-base shrink-0"></i>
-                  <div>
-                    <p class="text-xs font-black text-white leading-tight">Shreeji Krupa General Store</p>
-                    <p class="text-[10px] text-amber-300 font-bold">Open Daily • 7:00 AM - 10:30 PM</p>
-                  </div>
-                </div>
-                <button onclick="switchView('orders')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-lg shadow-md active:scale-95 transition-all whitespace-nowrap shrink-0">
-                  <i class="fa-solid fa-receipt"></i> Past Bills
-                </button>
               </div>
 
             </div>

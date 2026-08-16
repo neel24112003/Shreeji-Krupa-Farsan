@@ -975,6 +975,44 @@ function removeFromCart(productId) {
   showToast('Item removed from cart.', 'info');
 }
 
+// 1-Click Express Combo Handler
+function addComboToCart(productIds) {
+  let addedCount = 0;
+  for (let id of productIds) {
+    const p = products.find(prod => prod.id === id);
+    if (p && p.stock > 0) {
+      const existing = cart.find(item => item.id === id);
+      if (existing) {
+        if (existing.qty < p.stock) {
+          existing.qty += 1;
+          addedCount++;
+        }
+      } else {
+        cart.push({
+          id: p.id,
+          title: p.title,
+          price: p.price,
+          unit: p.unit,
+          qty: 1,
+          category: p.category,
+          image: p.image
+        });
+        addedCount++;
+      }
+    }
+  }
+
+  saveCart();
+  renderProducts();
+  renderCartDrawerItems();
+
+  if (addedCount > 0) {
+    showToast('⚡ Express combo pack added to your cart!', 'success');
+  } else {
+    showToast('Items in this combo are currently out of stock!', 'warning');
+  }
+}
+
 // Checkout Modal
 function openCheckoutModal() {
   if (cart.length === 0) {
