@@ -393,9 +393,13 @@ document.addEventListener('DOMContentLoaded', () => {
   renderApp();
 });
 
-// Initialize Persistent User Account Database
+// Initialize Persistent User Account Database with dual LocalStorage & SessionStorage backup
 function initUserDatabase() {
-  const savedUsersStr = localStorage.getItem('skf_users_db');
+  let savedUsersStr = localStorage.getItem('skf_users_db');
+  if (!savedUsersStr) {
+    savedUsersStr = sessionStorage.getItem('skf_users_db');
+  }
+
   if (savedUsersStr) {
     try {
       usersDb = JSON.parse(savedUsersStr);
@@ -405,7 +409,7 @@ function initUserDatabase() {
   }
 
   // Pre-seed default Admin and default Customer if empty
-  const defaultAdminExists = usersDb.some(u => u.email === 'admin@shreejikrupa.com' || u.role === 'admin');
+  const defaultAdminExists = usersDb.some(u => u && (u.email === 'admin@shreejikrupa.com' || u.role === 'admin'));
   if (!defaultAdminExists) {
     usersDb.push({
       id: 'usr_admin_default',
@@ -418,7 +422,7 @@ function initUserDatabase() {
     });
   }
 
-  const defaultCustomerExists = usersDb.some(u => u.email === 'nayan@shreejikrupa.com' || u.email === 'customer@shreejikrupa.com');
+  const defaultCustomerExists = usersDb.some(u => u && (u.email === 'nayan@shreejikrupa.com' || u.email === 'customer@shreejikrupa.com'));
   if (!defaultCustomerExists) {
     usersDb.push({
       id: 'usr_cust_default',
@@ -431,11 +435,27 @@ function initUserDatabase() {
     });
   }
 
+  // Pre-seed Neel customer account if not present
+  const neelUserExists = usersDb.some(u => u && (u.email === 'neel@gmail.com'));
+  if (!neelUserExists) {
+    usersDb.push({
+      id: 'usr_neel_default',
+      name: 'Neel',
+      email: 'neel@gmail.com',
+      phone: '9876543210',
+      address: 'Main Market, City Center',
+      password: '123456',
+      role: 'user'
+    });
+  }
+
   saveUserDatabase();
 }
 
 function saveUserDatabase() {
-  localStorage.setItem('skf_users_db', JSON.stringify(usersDb));
+  const jsonStr = JSON.stringify(usersDb);
+  localStorage.setItem('skf_users_db', jsonStr);
+  sessionStorage.setItem('skf_users_db', jsonStr);
 }
 
 // Load Data with LocalStorage Persistence for Admin Edits & Sync
@@ -1584,11 +1604,15 @@ function switchAuthTab(tabName) {
 function handleCustomerLogin(event) {
   event.preventDefault();
   const identifier = document.getElementById('login-identifier').value.trim().toLowerCase();
-  const password = document.getElementById('login-password').value;
+  const password = document.getElementById('login-password').value.trim();
 
-  const foundUser = usersDb.find(u => 
-    (u.email.toLowerCase() === identifier || u.phone === identifier) && u.password === password
-  );
+  const foundUser = usersDb.find(u => {
+    if (!u) return false;
+    const userEmail = (u.email || '').trim().toLowerCase();
+    const userPhone = (u.phone || '').trim().toLowerCase();
+    const userPass = String(u.password || '').trim();
+    return (userEmail === identifier || userPhone === identifier) && userPass === password;
+  });
 
   if (foundUser) {
     currentUser = {
@@ -1620,7 +1644,7 @@ function handleCustomerLogin(event) {
       }
     }
   } else {
-    showToast('Invalid Email/Phone or Password! Please try again or Register.', 'error');
+    showToast('Invalid Email/Phone or Password! Click "Register Now" if you need to create/reset your account.', 'error');
   }
 }
 
@@ -1631,17 +1655,29 @@ function handleCustomerRegister(event) {
   const email = document.getElementById('reg-email').value.trim().toLowerCase();
   const phone = document.getElementById('reg-phone').value.trim();
   const address = document.getElementById('reg-address').value.trim();
-  const pass = document.getElementById('reg-pass').value;
-  const confirmPass = document.getElementById('reg-confirm-pass').value;
+  const pass = document.getElementById('reg-pass').value.trim();
+  const confirmPass = document.getElementById('reg-confirm-pass').value.trim();
 
   if (pass !== confirmPass) {
     showToast('Passwords do not match! Please verify.', 'error');
     return;
   }
 
-  const existing = usersDb.find(u => u.email.toLowerCase() === email || u.phone === phone);
-  if (existing) {
-    showToast('An account with this Email or Phone already exists!', 'warning');
+  const existingIndex = usersDb.findIndex(u => u && ((u.email || '').toLowerCase() === email || (u.phone || '').trim() === phone));
+  if (existingIndex !== -1) {
+    // Update existing user account password and details seamlessly
+    usersDb[existingIndex].name = name || usersDb[existingIndex].name;
+    usersDb[existingIndex].address = address || usersDb[existingIndex].address;
+    usersDb[existingIndex].password = pass;
+    saveUserDatabase();
+
+    switchAuthTab('login');
+    const loginIdInput = document.getElementById('login-identifier');
+    const loginPassInput = document.getElementById('login-password');
+    if (loginIdInput) loginIdInput.value = email || phone;
+    if (loginPassInput) loginPassInput.value = '';
+
+    showToast(`Account password updated for ${name}! Please sign in now with your password. 🔐`, 'success');
     return;
   }
 
