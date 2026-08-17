@@ -589,10 +589,8 @@ function updateUserUIHeader() {
 
   if (currentUser) {
     if (currentUser.role === 'admin') {
-      roleBadge.innerHTML = `<button onclick="switchView('admin')" title="Click to Return to Admin Portal" class="px-2 py-0.5 sm:px-3 sm:py-1 bg-purple-600/40 hover:bg-purple-600/70 text-purple-100 border border-purple-400/60 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 shadow-md whitespace-nowrap transition-all active:scale-95 cursor-pointer">
-        <i class="fa-solid fa-user-shield text-[10px] sm:text-xs text-purple-300"></i>
-        <span class="hidden sm:inline">${currentUser.name} (Admin Portal) ↩</span>
-        <span class="sm:hidden text-[9px] font-black">Admin ↩</span>
+      roleBadge.innerHTML = `<button onclick="switchView('admin')" title="Click to Return to Admin Portal" class="hidden md:flex px-3 py-1 bg-purple-600/40 hover:bg-purple-600/70 text-purple-100 border border-purple-400/60 rounded-full text-xs font-bold items-center gap-1 shadow-md whitespace-nowrap transition-all active:scale-95 cursor-pointer">
+        <i class="fa-solid fa-user-shield text-xs text-purple-300"></i> ${currentUser.name} (Admin Portal) ↩
       </button>`;
       adminTabNav?.classList.remove('hidden');
     } else {
@@ -602,12 +600,12 @@ function updateUserUIHeader() {
       adminTabNav?.classList.add('hidden');
     }
 
-    authBtn.innerHTML = `<i class="fa-solid fa-right-from-bracket text-white"></i> <span class="hidden sm:inline">Logout (${currentUser.name.split(' ')[0]})</span><span class="sm:hidden">Logout</span>`;
+    authBtn.innerHTML = `<i class="fa-solid fa-right-from-bracket text-white text-[11px] sm:text-xs"></i> <span class="hidden sm:inline">Logout</span>`;
     authBtn.onclick = logoutUser;
   } else {
     roleBadge.innerHTML = '';
     adminTabNav?.classList.add('hidden');
-    authBtn.innerHTML = `<i class="fa-solid fa-user text-white"></i> Login`;
+    authBtn.innerHTML = `<i class="fa-solid fa-user text-white text-[11px] sm:text-xs"></i> <span class="hidden sm:inline">Login</span>`;
     authBtn.onclick = () => openAuthModal();
   }
 }
