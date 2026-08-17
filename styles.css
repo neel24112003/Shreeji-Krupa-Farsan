@@ -21,6 +21,16 @@ body {
   overflow-x: hidden;
 }
 
+/* Zero-Flicker Instant Admin Refresh Protection */
+html.init-admin-view #shop-section,
+html.init-admin-view #hero-banner {
+  display: none !important;
+}
+
+html.init-admin-view #admin-section {
+  display: block !important;
+}
+
 /* Background Gradients */
 .bg-vibrant-gradient {
   background: radial-gradient(circle at 10% 20%, rgba(245, 158, 11, 0.15) 0%, transparent 40%),

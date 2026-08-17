@@ -589,9 +589,9 @@ function updateUserUIHeader() {
 
   if (currentUser) {
     if (currentUser.role === 'admin') {
-      roleBadge.innerHTML = `<span class="px-2 py-0.5 sm:px-3 sm:py-1 bg-purple-600/30 text-purple-200 border border-purple-400/40 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 shadow-md whitespace-nowrap">
-        <i class="fa-solid fa-user-shield text-[10px] sm:text-xs text-purple-300"></i> <span class="hidden md:inline">${currentUser.name}</span> (Admin)
-      </span>`;
+      roleBadge.innerHTML = `<button onclick="switchView('admin')" title="Click to Return to Admin Portal" class="px-2 py-0.5 sm:px-3 sm:py-1 bg-purple-600/40 hover:bg-purple-600/70 text-purple-100 border border-purple-400/60 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 shadow-md whitespace-nowrap transition-all active:scale-95 cursor-pointer">
+        <i class="fa-solid fa-user-shield text-[10px] sm:text-xs text-purple-300"></i> <span class="hidden md:inline">${currentUser.name}</span> (Admin Portal) ↩
+      </button>`;
       adminTabNav?.classList.remove('hidden');
     } else {
       roleBadge.innerHTML = `<span class="px-2 py-0.5 sm:px-3 sm:py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 shadow-md whitespace-nowrap">
@@ -603,10 +603,10 @@ function updateUserUIHeader() {
     authBtn.innerHTML = `<i class="fa-solid fa-right-from-bracket text-white"></i> <span class="hidden sm:inline">Logout (${currentUser.name.split(' ')[0]})</span><span class="sm:hidden">Logout</span>`;
     authBtn.onclick = logoutUser;
   } else {
-    roleBadge.innerHTML = ``;
+    roleBadge.innerHTML = '';
     adminTabNav?.classList.add('hidden');
-    authBtn.innerHTML = `<i class="fa-solid fa-user text-white"></i> <span class="hidden sm:inline">Login / Access</span><span class="sm:hidden">Login</span>`;
-    authBtn.onclick = () => openAuthModal('login');
+    authBtn.innerHTML = `<i class="fa-solid fa-user text-white"></i> Login`;
+    authBtn.onclick = () => openAuthModal();
   }
 }
 
@@ -647,26 +647,46 @@ function setupEventListeners() {
 function switchView(viewName) {
   activeView = viewName;
   localStorage.setItem('skf_active_view', viewName);
+  
+  // Clean initial head script class
+  document.documentElement.classList.remove('init-admin-view');
+
   const shopSec = document.getElementById('shop-section');
   const adminSec = document.getElementById('admin-section');
   const ordersSec = document.getElementById('orders-section');
   const heroSec = document.getElementById('hero-banner');
+  const adminBanner = document.getElementById('admin-mode-banner');
 
   shopSec?.classList.add('hidden');
   adminSec?.classList.add('hidden');
   ordersSec?.classList.add('hidden');
 
+  const isAdminUser = currentUser && currentUser.role === 'admin';
+
   if (viewName === 'shop') {
     shopSec?.classList.remove('hidden');
     heroSec?.classList.remove('hidden');
     renderProducts();
+
+    if (isAdminUser) {
+      adminBanner?.classList.remove('hidden');
+    } else {
+      adminBanner?.classList.add('hidden');
+    }
   } else if (viewName === 'admin') {
     adminSec?.classList.remove('hidden');
     heroSec?.classList.add('hidden');
+    adminBanner?.classList.add('hidden');
     renderAdminDashboard();
   } else if (viewName === 'orders') {
     ordersSec?.classList.remove('hidden');
     heroSec?.classList.add('hidden');
+
+    if (isAdminUser) {
+      adminBanner?.classList.remove('hidden');
+    } else {
+      adminBanner?.classList.add('hidden');
+    }
     renderOrdersView();
   }
 
