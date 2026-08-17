@@ -590,7 +590,9 @@ function updateUserUIHeader() {
   if (currentUser) {
     if (currentUser.role === 'admin') {
       roleBadge.innerHTML = `<button onclick="switchView('admin')" title="Click to Return to Admin Portal" class="px-2 py-0.5 sm:px-3 sm:py-1 bg-purple-600/40 hover:bg-purple-600/70 text-purple-100 border border-purple-400/60 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 shadow-md whitespace-nowrap transition-all active:scale-95 cursor-pointer">
-        <i class="fa-solid fa-user-shield text-[10px] sm:text-xs text-purple-300"></i> <span class="hidden md:inline">${currentUser.name}</span> (Admin Portal) ↩
+        <i class="fa-solid fa-user-shield text-[10px] sm:text-xs text-purple-300"></i>
+        <span class="hidden sm:inline">${currentUser.name} (Admin Portal) ↩</span>
+        <span class="sm:hidden text-[9px] font-black">Admin ↩</span>
       </button>`;
       adminTabNav?.classList.remove('hidden');
     } else {
@@ -1431,25 +1433,25 @@ function renderAdminDashboard() {
 
   analyticsContainer.innerHTML = `
     <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-      <div class="glass-card p-4 border border-amber-500/30">
-        <p class="text-xs text-slate-300 font-semibold">Billing Revenue</p>
-        <h3 class="text-2xl font-black text-amber-400 text-glow-gold mt-1">₹${totalRevenue}</h3>
+      <div class="glass-card p-3 sm:p-4 border border-amber-500/30">
+        <p class="text-[11px] sm:text-xs text-slate-300 font-semibold">Billing Revenue</p>
+        <h3 class="text-xl sm:text-2xl font-black text-amber-400 text-glow-gold mt-1">₹${totalRevenue}</h3>
       </div>
-      <div class="glass-card p-4 border border-cyan-500/30">
-        <p class="text-xs text-slate-300 font-semibold">Bills Issued</p>
-        <h3 class="text-2xl font-black text-cyan-400 mt-1">${totalOrdersCount}</h3>
+      <div class="glass-card p-3 sm:p-4 border border-cyan-500/30">
+        <p class="text-[11px] sm:text-xs text-slate-300 font-semibold">Bills Issued</p>
+        <h3 class="text-xl sm:text-2xl font-black text-cyan-400 mt-1">${totalOrdersCount}</h3>
       </div>
-      <div class="glass-card p-4 border border-purple-500/30">
-        <p class="text-xs text-slate-300 font-semibold">Registered Users</p>
-        <h3 class="text-2xl font-black text-purple-400 mt-1">${registeredUsersCount}</h3>
+      <div class="glass-card p-3 sm:p-4 border border-purple-500/30">
+        <p class="text-[11px] sm:text-xs text-slate-300 font-semibold">Registered Users</p>
+        <h3 class="text-xl sm:text-2xl font-black text-purple-400 mt-1">${registeredUsersCount}</h3>
       </div>
-      <div class="glass-card p-4 border border-amber-500/30">
-        <p class="text-xs text-slate-300 font-semibold">Low Stock Alerts</p>
-        <h3 class="text-2xl font-black text-amber-400 mt-1">${lowStockCount}</h3>
+      <div class="glass-card p-3 sm:p-4 border border-amber-500/30">
+        <p class="text-[11px] sm:text-xs text-slate-300 font-semibold">Low Stock Alerts</p>
+        <h3 class="text-xl sm:text-2xl font-black text-amber-400 mt-1">${lowStockCount}</h3>
       </div>
-      <div class="glass-card p-4 border border-red-500/30">
-        <p class="text-xs text-slate-300 font-semibold">Out of Stock</p>
-        <h3 class="text-2xl font-black text-red-400 mt-1">${outOfStockCount}</h3>
+      <div class="glass-card p-3 sm:p-4 border border-red-500/30 col-span-2 md:col-span-1">
+        <p class="text-[11px] sm:text-xs text-slate-300 font-semibold">Out of Stock</p>
+        <h3 class="text-xl sm:text-2xl font-black text-red-400 mt-1">${outOfStockCount}</h3>
       </div>
     </div>
   `;
